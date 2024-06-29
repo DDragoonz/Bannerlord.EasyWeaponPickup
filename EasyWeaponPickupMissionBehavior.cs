@@ -169,15 +169,15 @@ namespace EasyWeaponPickup
                     }
                     
 
-                    IEnumerable<GameEntity> entities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>();
+                    List<GameEntity> gameEntities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>().ToList();
 
                     float maxHeightBonus = Agent.Main.MountAgent == null ? 0 : horseHeightBonus;
                     
-                    IEnumerable<GameEntity> reachableDroppedItem = (from x in entities
+                    List<GameEntity> reachableDroppedItem = (from x in gameEntities
                         where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= minDistance
                         && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= maxHeight + maxHeightBonus
-                        orderby x.GetScriptComponents<SpawnedItemEntity>().First().WeaponCopy.IsAnyConsumable()
-                        select x);
+                        // orderby x.GetScriptComponents<SpawnedItemEntity>().First().WeaponCopy.IsAnyConsumable() // was causing crash?
+                        select x).ToList();
                     
                     // foreach (GameEntity gameEntity in entities)
                     // {
@@ -239,7 +239,7 @@ namespace EasyWeaponPickup
 
                     if (debugEnabled)
                     {
-                        InformationManager.DisplayMessage(new InformationMessage("usable mission object count : "+entities.Count()));
+                        InformationManager.DisplayMessage(new InformationMessage("usable mission object count : "+gameEntities.Count()));
                         InformationManager.DisplayMessage(new InformationMessage("nearest usable mission object : "+reachableDroppedItem.Count()));    
                     }
                     
