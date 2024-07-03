@@ -6,6 +6,8 @@ using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.GauntletUI.Mission;
+
 
 
 namespace EasyWeaponPickup
@@ -13,6 +15,12 @@ namespace EasyWeaponPickup
     public class EasyWeaponPickupMissionBehavior : MissionLogic
     {
         // public override MissionBehaviorType BehaviorType => MissionBehaviorType.Logic;
+
+        public override void OnRenderingStarted()
+        {
+            base.OnRenderingStarted();
+            Input = Mission.GetMissionBehavior<MissionGauntletMainAgentEquipmentControllerView>().Input;
+        }
 
         public override void OnFocusGained(Agent agent, IFocusable focusableObject, bool isInteractable)
         {
@@ -98,7 +106,13 @@ namespace EasyWeaponPickup
 
             try
             {
-                if (canPickup && !isPressingKey && Input.IsKeyPressed(InputKey.F))
+                if (Input == null)
+                {
+                    return;
+                }
+                
+                
+                if (canPickup && !isPressingKey && Input.IsGameKeyPressed(13) /*Input.IsKeyPressed(InputKey.F)*/)
                 {
                     isPressingKey = true;
                     MissionEquipment mainEquipment = Agent.Main.Equipment;
@@ -245,7 +259,7 @@ namespace EasyWeaponPickup
                     
                 }
 
-                if (Input.IsKeyReleased(InputKey.F))
+                if (Input.IsGameKeyReleased(13) /*Input.IsKeyReleased(InputKey.F)*/)
                 {
                     isPressingKey = false;
                 }
@@ -258,13 +272,12 @@ namespace EasyWeaponPickup
                 }
             }
             
-            
-            
         }
 
         // cache
         private bool canPickup = true;
         private bool isPressingKey = false;
+        private IInputContext Input = null;
         
         // setttings
         private float minDistance = 2;
