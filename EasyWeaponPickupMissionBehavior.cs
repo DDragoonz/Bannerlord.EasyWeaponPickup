@@ -19,12 +19,37 @@ namespace EasyWeaponPickup
         public override void OnRenderingStarted()
         {
             base.OnRenderingStarted();
-            Input = Mission.GetMissionBehavior<MissionGauntletMainAgentEquipmentControllerView>().Input;
+            try
+            {
+                MissionGauntletMainAgentEquipmentControllerView agentEquipmentControllerView = Mission.GetMissionBehavior<MissionGauntletMainAgentEquipmentControllerView>();
+                if (agentEquipmentControllerView == null)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("Unable to find MissionGauntletMainAgentEquipmentControllerView! easy pickup will temporary disabled for this scene!", Colors.Red));
+                }
+                else
+                {
+                    Input = agentEquipmentControllerView.Input;
+                }
+                
+            }
+            catch (Exception e)
+            {
+                Input = null;
+                if (debugEnabled)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
+                }
+            }
+            
         }
 
         public override void OnFocusGained(Agent agent, IFocusable focusableObject, bool isInteractable)
         {
             base.OnFocusGained(agent, focusableObject, isInteractable);
+            if (Input == null)
+            {
+                return;
+            }
             try
             {
                 if (isInteractable)
@@ -63,6 +88,10 @@ namespace EasyWeaponPickup
         public override void OnFocusLost(Agent agent, IFocusable focusableObject)
         {
             base.OnFocusLost(agent, focusableObject);
+            if (Input == null)
+            {
+                return;
+            }
             canPickup = true;
             if (debugEnabled)
             {
