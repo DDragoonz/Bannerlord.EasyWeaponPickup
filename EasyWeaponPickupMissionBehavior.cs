@@ -28,14 +28,14 @@ namespace EasyWeaponPickup
                 }
                 else
                 {
-                    Input = agentEquipmentControllerView.Input;
+                    _input = agentEquipmentControllerView.Input;
                 }
                 
             }
             catch (Exception e)
             {
-                Input = null;
-                if (debugEnabled)
+                _input = null;
+                if (DebugEnabled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
                 }
@@ -46,37 +46,24 @@ namespace EasyWeaponPickup
         public override void OnFocusGained(Agent agent, IFocusable focusableObject, bool isInteractable)
         {
             base.OnFocusGained(agent, focusableObject, isInteractable);
-            if (Input == null)
-            {
-                return;
-            }
+            if (_input == null) return;
+            
             try
             {
-                if (isInteractable)
-                {
-                    Agent focusedAgent = focusableObject as Agent;
-                    if (focusedAgent != null && !focusedAgent.IsMount )
-                    {
-                        return;
-                    }
-                    
-                    canPickup = false;
-                    if (debugEnabled)
-                    {
-                        InformationManager.DisplayMessage(new InformationMessage("pickup disabled"));
-                    }
-
-                }
+                if (!isInteractable) return;
                 
-                // if (Agent.Main.CanUseObject(focusableObject as UsableMissionObject))
-                // {
-                //     canPickup = false;
-                //     InformationManager.DisplayMessage(new InformationMessage("pickup disabled"));
-                // }
+                if (focusableObject is Agent focusedAgent && !focusedAgent.IsMount ) return;
+                    
+                _canPickup = false;
+                if (DebugEnabled)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("pickup disabled"));
+                }
+
             }
             catch (Exception e)
             {
-                if (debugEnabled)
+                if (DebugEnabled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
                 }
@@ -88,12 +75,10 @@ namespace EasyWeaponPickup
         public override void OnFocusLost(Agent agent, IFocusable focusableObject)
         {
             base.OnFocusLost(agent, focusableObject);
-            if (Input == null)
-            {
-                return;
-            }
-            canPickup = true;
-            if (debugEnabled)
+            if (_input == null) return;
+            
+            _canPickup = true;
+            if (DebugEnabled)
             {
                 InformationManager.DisplayMessage(new InformationMessage("pickup enabled"));
             }
@@ -103,199 +88,46 @@ namespace EasyWeaponPickup
         {
             base.OnMissionTick(dt);
 
-            if (Agent.Main == null) return;
-
-            // if (debugEnabled)
-            // {
-            // if (Input.IsKeyReleased(InputKey.Down))
-            // {
-            //     maxHeight -= 0.1f;
-            //     if (maxHeight < 0.1) maxHeight = 0.1f;
-            //     InformationManager.DisplayMessage(new InformationMessage("maxheight : "+maxHeight));
-            // }
-            // if (Input.IsKeyReleased(InputKey.Up))
-            // {
-            //     maxHeight += 0.1f;
-            //     if (maxHeight < 0.1) maxHeight = 0.1f;
-            //     InformationManager.DisplayMessage(new InformationMessage("maxheight : "+maxHeight));
-            // }
-            // if (Input.IsKeyReleased(InputKey.Left))
-            // {
-            //     minDistance -= 0.1f;
-            //     if (minDistance < 0.1) minDistance = 0.1f;
-            //     InformationManager.DisplayMessage(new InformationMessage("minDistance : "+minDistance));
-            // }
-            // if (Input.IsKeyReleased(InputKey.Right))
-            // {
-            //     minDistance += 0.1f;
-            //     if (minDistance < 0.1) minDistance = 0.1f;
-            //     InformationManager.DisplayMessage(new InformationMessage("minDistance : "+minDistance));
-            // }
-            // }
-
             try
             {
-                if (Input == null)
-                {
-                    return;
-                }
+                if (Agent.Main == null || _input == null) return;
                 
-                
-                if (canPickup && !isPressingKey && Input.IsGameKeyPressed(13) /*Input.IsKeyPressed(InputKey.F)*/)
+                if (_canPickup && !_isPressingKey && _input.IsGameKeyPressed(13) /*Input.IsKeyPressed(InputKey.F)*/)
                 {
-                    isPressingKey = true;
-                    MissionEquipment mainEquipment = Agent.Main.Equipment;
-
-                    bool hasEmptySlot = false;
-
-                    HashSet<ItemObject.ItemTypeEnum> pickableItem = new HashSet<ItemObject.ItemTypeEnum>
-                    {
-                        ItemObject.ItemTypeEnum.OneHandedWeapon,
-                        ItemObject.ItemTypeEnum.TwoHandedWeapon,
-                        ItemObject.ItemTypeEnum.Polearm,
-                        ItemObject.ItemTypeEnum.Shield,
-                        ItemObject.ItemTypeEnum.Bow,
-                        ItemObject.ItemTypeEnum.Crossbow,
-                    };
-
-                    HashSet<WeaponClass> allowedAmmoClass = new HashSet<WeaponClass>();
-
-                    for (EquipmentIndex i = EquipmentIndex.WeaponItemBeginSlot; i < EquipmentIndex.NumPrimaryWeaponSlots; i++)
-                    {
-                        MissionWeapon equipment = mainEquipment[i];
-                        
-                        if (equipment.IsEmpty)
-                        {
-                            hasEmptySlot = true;
-                        }
-                        else
-                        {
-                            pickableItem.Remove(equipment.Item.Type); // prevent picking item from same category
-
-                            if (equipment.Item.Type == ItemObject.ItemTypeEnum.Bow)
-                            {
-                                pickableItem.Add(ItemObject.ItemTypeEnum.Arrows);
-                            }
-                            else if (equipment.Item.Type == ItemObject.ItemTypeEnum.Crossbow)
-                            {
-                                pickableItem.Add(ItemObject.ItemTypeEnum.Bolts);
-                            }
-                            
-                            if (equipment.IsAnyConsumable())
-                            {
-                                if (equipment.Amount < equipment.MaxAmmo)
-                                {
-                                    allowedAmmoClass.Add(equipment.CurrentUsageItem.WeaponClass);
-                                }
-
-                                if (equipment.Amount == 0)
-                                {
-                                    hasEmptySlot = true;
-                                }
-
-                            }
-                        }
-                    }
-
-                    if (hasEmptySlot)
-                    {
-                        pickableItem.Add(ItemObject.ItemTypeEnum.Thrown); // thrown item always can be picked up.    
-                    }
-                    else
-                    {
-                        pickableItem.Clear();
-                    }
-
-                    if (allowedAmmoClass.IsEmpty() && pickableItem.IsEmpty())
-                    {
-                        return;
-                    }
+                    _isPressingKey = true;
                     
+                    GetPickableItemAndAmmoClass(out HashSet<ItemObject.ItemTypeEnum> pickableItem, out HashSet<WeaponClass> allowedAmmoClass);
 
-                    List<GameEntity> gameEntities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>().ToList();
-
-                    float maxHeightBonus = Agent.Main.MountAgent == null ? 0 : horseHeightBonus;
+                    if (allowedAmmoClass.IsEmpty() && pickableItem.IsEmpty()) return;
                     
-                    List<GameEntity> reachableDroppedItem = (from x in gameEntities
-                        where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= minDistance
-                        && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= maxHeight + maxHeightBonus
-                        // orderby x.GetScriptComponents<SpawnedItemEntity>().First().WeaponCopy.IsAnyConsumable() // was causing crash?
-                        select x).ToList();
+                    UsableMissionObject itemToUse = GetNearestDroppedItem(pickableItem,allowedAmmoClass);
                     
-                    // foreach (GameEntity gameEntity in entities)
-                    // {
-                    // if (debugEnabled)
-                    // {
-                        //     InformationManager.DisplayMessage(new InformationMessage(gameEntity.Name + " distance : " + (gameEntity.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) + " height : "+Math.Abs(gameEntity.GlobalPosition.Z - Agent.Main.Position.Z))));
-                    // }
-                    // }
-
-                    SpawnedItemEntity droppedItemToUse = null;
-                    foreach (GameEntity gameEntity in reachableDroppedItem)
+                    // if no dropped items and allow pick up ammo
+                    if (itemToUse == null && allowedAmmoClass.Count > 0)
                     {
-                        foreach (SpawnedItemEntity droppedItem in gameEntity.GetScriptComponents<SpawnedItemEntity>())
+                        itemToUse = GetNearestAmmoRefill();
+                    }
+
+                    if (itemToUse != null)
+                    {
+                        Agent.Main.UseGameObject(itemToUse);
+                        if (DebugEnabled)
                         {
-                            if (droppedItem.WeaponCopy.IsEmpty || droppedItem.IsDisabledForPlayers || !Agent.Main.CanUseObject(droppedItem))
-                            {
-                                continue;
-                            }
-
-                            if (droppedItem.WeaponCopy.IsAnyConsumable())
-                            {
-                                if (allowedAmmoClass.Contains(droppedItem.WeaponCopy.CurrentUsageItem.WeaponClass))
-                                {
-                                    droppedItemToUse = droppedItem;
-                                    break;
-                                }
-                            }
-                            
-                            if (!pickableItem.Contains(droppedItem.WeaponCopy.Item.Type))
-                            {
-                                continue;
-                            }
-
-                            if (!Agent.Main.CanQuickPickUp(droppedItem))
-                            {
-                                continue;
-                            }
-                            droppedItemToUse = droppedItem;
-                                    
-                            break;
-                        }
-
-                        if (droppedItemToUse != null)
-                        {
-                            break;
+                            InformationManager.DisplayMessage(new InformationMessage("equip / use : "+ itemToUse + " distance : " + (itemToUse.GameEntity.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) + " height : "+Math.Abs(itemToUse.GameEntity.GlobalPosition.Z - Agent.Main.Position.Z))));    
                         }
                         
-                    }
-
-                    if (droppedItemToUse != null)
-                    {
-                        Agent.Main.UseGameObject(droppedItemToUse);
-                        if (debugEnabled)
-                        {
-                            InformationManager.DisplayMessage(new InformationMessage("equip / use : "+ droppedItemToUse.WeaponName + " distance : " + (droppedItemToUse.GameEntity.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) + " height : "+Math.Abs(droppedItemToUse.GameEntity.GlobalPosition.Z - Agent.Main.Position.Z))));    
-                        }
-                        
-                    }
-
-                    if (debugEnabled)
-                    {
-                        InformationManager.DisplayMessage(new InformationMessage("usable mission object count : "+gameEntities.Count()));
-                        InformationManager.DisplayMessage(new InformationMessage("nearest usable mission object : "+reachableDroppedItem.Count()));    
                     }
                     
                 }
 
-                if (Input.IsGameKeyReleased(13) /*Input.IsKeyReleased(InputKey.F)*/)
+                if (_input.IsGameKeyReleased(13) /*Input.IsKeyReleased(InputKey.F)*/)
                 {
-                    isPressingKey = false;
+                    _isPressingKey = false;
                 }
             }
             catch (Exception e)
             {
-                if (debugEnabled)
+                if (DebugEnabled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
                 }
@@ -303,17 +135,165 @@ namespace EasyWeaponPickup
             
         }
 
-        // cache
-        private bool canPickup = true;
-        private bool isPressingKey = false;
-        private IInputContext Input = null;
-        
-        // setttings
-        private float minDistance = 2;
-        private float maxHeight = 3;
-        private float horseHeightBonus = 1;
-        
-        private bool debugEnabled = false;
+        private UsableMissionObject GetNearestDroppedItem(HashSet<ItemObject.ItemTypeEnum> pickableItem, HashSet<WeaponClass> allowedAmmoClass)
+        {
+            List<GameEntity> gameEntities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>().ToList();
 
+            List<GameEntity> reachableDroppedItem = (from x in gameEntities
+                where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MinDistance
+                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxHeight + MaxHeightBonus
+                select x).ToList();
+            
+            if (DebugEnabled)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("usable mission object count : "+gameEntities.Count()));
+                InformationManager.DisplayMessage(new InformationMessage("nearest usable mission object : "+reachableDroppedItem.Count()));    
+            }
+            
+            foreach (GameEntity gameEntity in reachableDroppedItem)
+            {
+                foreach (SpawnedItemEntity droppedItem in gameEntity.GetScriptComponents<SpawnedItemEntity>())
+                {
+                    if (droppedItem.WeaponCopy.IsEmpty || droppedItem.IsDisabledForPlayers || !Agent.Main.CanUseObject(droppedItem))
+                    {
+                        continue;
+                    }
+
+                    if (droppedItem.WeaponCopy.IsAnyConsumable())
+                    {
+                        if (allowedAmmoClass.Contains(droppedItem.WeaponCopy.CurrentUsageItem.WeaponClass))
+                        {
+                            return droppedItem;
+                        }
+                    }
+
+                    if (!pickableItem.Contains(droppedItem.WeaponCopy.Item.Type))
+                    {
+                        continue;
+                    }
+
+                    if (!Agent.Main.CanQuickPickUp(droppedItem))
+                    {
+                        continue;
+                    }
+
+                    return droppedItem;
+                }
+
+
+            }
+
+            return null;
+        }
+
+        private void GetPickableItemAndAmmoClass(out HashSet<ItemObject.ItemTypeEnum> pickableItem, out HashSet<WeaponClass> allowedAmmoClass)
+        {
+            MissionEquipment mainEquipment = Agent.Main.Equipment;
+
+            bool hasEmptySlot = false;
+
+            pickableItem = new HashSet<ItemObject.ItemTypeEnum>
+            {
+                ItemObject.ItemTypeEnum.OneHandedWeapon,
+                ItemObject.ItemTypeEnum.TwoHandedWeapon,
+                ItemObject.ItemTypeEnum.Polearm,
+                ItemObject.ItemTypeEnum.Shield,
+                ItemObject.ItemTypeEnum.Bow,
+                ItemObject.ItemTypeEnum.Crossbow,
+            };
+
+            allowedAmmoClass = new HashSet<WeaponClass>();
+
+            for (EquipmentIndex i = EquipmentIndex.WeaponItemBeginSlot; i < EquipmentIndex.NumPrimaryWeaponSlots; i++)
+            {
+                MissionWeapon equipment = mainEquipment[i];
+
+                if (equipment.IsEmpty)
+                {
+                    hasEmptySlot = true;
+                }
+                else
+                {
+                    pickableItem.Remove(equipment.Item.Type); // prevent picking item from same category
+
+                    if (equipment.Item.Type == ItemObject.ItemTypeEnum.Bow)
+                    {
+                        pickableItem.Add(ItemObject.ItemTypeEnum.Arrows);
+                    }
+                    else if (equipment.Item.Type == ItemObject.ItemTypeEnum.Crossbow)
+                    {
+                        pickableItem.Add(ItemObject.ItemTypeEnum.Bolts);
+                    }
+
+                    if (equipment.IsAnyConsumable())
+                    {
+                        if (equipment.Amount < equipment.MaxAmmo)
+                        {
+                            allowedAmmoClass.Add(equipment.CurrentUsageItem.WeaponClass);
+                        }
+
+                        if (equipment.Amount == 0)
+                        {
+                            hasEmptySlot = true;
+                        }
+
+                    }
+                }
+            }
+
+            if (hasEmptySlot)
+            {
+                pickableItem.Add(ItemObject.ItemTypeEnum.Thrown); // thrown item always can be picked up.    
+            }
+            else
+            {
+                pickableItem.Clear();
+            }
+        }
+
+        private UsableMissionObject GetNearestAmmoRefill()
+        {
+            // find nearest ammo refill point
+            List<GameEntity> ammoRefillEntity = Mission.GetActiveEntitiesWithScriptComponentOfType<StandingPointWithWeaponRequirement>().ToList();
+                        
+            List<GameEntity> reachableAmmoRefill = (from x in ammoRefillEntity
+                where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MinDistance
+                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxHeight + MaxHeightBonus
+                select x).ToList();
+
+            foreach (GameEntity gameEntity in reachableAmmoRefill)
+            {
+                foreach (StandingPointWithWeaponRequirement ammoRefill in gameEntity.GetScriptComponents<StandingPointWithWeaponRequirement>())
+                {
+                    if (!ammoRefill.IsDisabledForPlayers && Agent.Main.CanUseObject(ammoRefill))
+                    {
+                        return ammoRefill;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private float MaxHeightBonus
+        {
+            get
+            {
+                if (Agent.Main == null) return 0;
+                return Agent.Main.MountAgent == null ? 0 : HorseHeightBonus;
+            }
+        }
+
+        // cache
+        private bool _canPickup = true;
+        private bool _isPressingKey = false;
+        private IInputContext _input = null;
+        
+        // settings
+        private const float MinDistance = 2;
+        private const float MaxHeight = 3;
+        private const float HorseHeightBonus = 1;
+
+        private const bool DebugEnabled = false;
     }
 }
