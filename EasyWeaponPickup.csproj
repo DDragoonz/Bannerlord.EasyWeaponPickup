@@ -33,10 +33,13 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-<!--        <Reference Include="0Harmony">-->
-<!--            <Private>false</Private>-->
-<!--            <HintPath>..\..\Steam Games\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>-->
-<!--        </Reference>-->
+        <PackageReference Include="Bannerlord.MCM" Version="5.0.0" IncludeAssets="compile" />
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <Private>false</Private>
+            <HintPath>..\..\Steam Games\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
+        </Reference>
         <Reference Include="Bannerlord.Harmony">
             <Private>false</Private>
             <HintPath>..\..\Steam Games\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client\Bannerlord.Harmony.dll</HintPath>
@@ -319,6 +322,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="EasyWeaponPickupConfig.cs" />
         <Compile Include="EasyWeaponPickupMissionBehavior.cs" />
         <Compile Include="EasyWeaponPickupSubModule.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
