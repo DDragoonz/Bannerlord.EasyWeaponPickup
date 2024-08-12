@@ -1,6 +1,8 @@
-﻿using MCM.Abstractions.Attributes;
+﻿using System.Collections.Generic;
+using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Base.Global;
+using MCM.Common;
 
 namespace EasyWeaponPickup
 {
