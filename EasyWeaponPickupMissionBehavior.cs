@@ -177,6 +177,10 @@ namespace EasyWeaponPickup
 
                     if (droppedItem.WeaponCopy.IsAnyConsumable())
                     {
+                        if (droppedItem.WeaponCopy.Amount == 0)
+                        {
+                            continue;
+                        }
                         if (allowedAmmoClass.Contains(droppedItem.WeaponCopy.CurrentUsageItem.WeaponClass))
                         {
                             return droppedItem;
@@ -230,8 +234,7 @@ namespace EasyWeaponPickup
                 }
                 else
                 {
-                    pickableItem.Remove(equipment.Item.Type); // prevent picking item from same category
-
+                    
                     if (equipment.Item.Type == ItemObject.ItemTypeEnum.Bow)
                     {
                         pickableItem.Add(ItemObject.ItemTypeEnum.Arrows);
@@ -253,6 +256,10 @@ namespace EasyWeaponPickup
                             hasEmptySlot = true;
                         }
 
+                    }
+                    else
+                    {
+                        pickableItem.Remove(equipment.Item.Type); // prevent picking item from same category
                     }
                 }
             }
