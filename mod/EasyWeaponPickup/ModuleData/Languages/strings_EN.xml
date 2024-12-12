@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<base>
+	<tags>
+	  <tag language="English"/>
+	</tags>
+	<strings>
+		<!-- MCM -->
+		<string id="aB4e0AFC78" text="Settings" />
+		<string id="527a3d7b36" text="Debug" />
+		<string id="d62cd6Cfbf" text="Max Pickup Distance" />
+		<string id="f3009bd2a5" text="Max weapon pickup distance" />
+		<string id="8A792195Fe" text="Max Pickup Height" />
+		<string id="442565bF83" text="Max weapon pickup height" />
+		<string id="4a9a53132e" text="Pickup Height Bonus Mounted" />
+		<string id="7f461F5ce5" text="Pickup height bonus while mounted" />
+		<string id="A691579aA0" text="Mounted Require Perk" />
+		<string id="2A1F2540ac" text='Shall picking up while mounted require perk "Long Reach"?' />
+		<string id="A7F6605961" text="Minimum Pickup Height Mounted" />
+		<string id="9949d78018" text="Minimum pick up height while mounted. only if perk requirement is true" />
+		<string id="Ae900c8c50" text="Enable Debug" />
+		<string id="B6E7024FFf" text="Show debug Message" />
+	
+		<!-- debug messages -->
+		<string id="301715F362" text="pickup enabled" />
+		<string id="1c41cDf6A9" text="pickup disabled" />
+		<string id="86907d5377" text="equip / use : {itemToUse} distance {distance} height : {height}" />
+		<string id="c51D173a44" text="Unable to find MissionGauntletMainAgentEquipmentControllerView! easy pickup will temporary disabled for this scene!" />
+		<string id="AEd61b7E1b" text="usable mission object count : {count}" />
+		<string id="FeAe68E299" text="nearest usable mission object : {count}" />	
+	</strings>
+</base>
