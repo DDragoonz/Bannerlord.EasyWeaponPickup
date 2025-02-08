@@ -37,9 +37,9 @@ namespace EasyWeaponPickup
             catch (Exception e)
             {
                 _input = null;
-                if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+                if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
                 {
-                    InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
+                    InformationManager.DisplayMessage(new InformationMessage(e.StackTrace, Colors.Red));
                 }
             }
             
@@ -57,7 +57,7 @@ namespace EasyWeaponPickup
                 if (focusableObject is Agent focusedAgent && !focusedAgent.IsMount ) return;
                     
                 _canPickup = false;
-                if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+                if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage("pickup disabled"));
                 }
@@ -65,9 +65,9 @@ namespace EasyWeaponPickup
             }
             catch (Exception e)
             {
-                if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+                if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
                 {
-                    InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
+                    InformationManager.DisplayMessage(new InformationMessage(e.StackTrace, Colors.Red));
                 }
             }
 
@@ -80,7 +80,7 @@ namespace EasyWeaponPickup
             if (_input == null) return;
             
             _canPickup = true;
-            if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+            if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
             {
                 InformationManager.DisplayMessage(new InformationMessage("pickup enabled"));
             }
@@ -114,7 +114,7 @@ namespace EasyWeaponPickup
                     if (itemToUse != null)
                     {
                         Agent.Main.UseGameObject(itemToUse);
-                        if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+                        if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
                         {
                             InformationManager.DisplayMessage(new InformationMessage("equip / use : "+ itemToUse + " distance : " + (itemToUse.GameEntity.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) + " height : "+Math.Abs(itemToUse.GameEntity.GlobalPosition.Z - Agent.Main.Position.Z))));    
                         }
@@ -130,9 +130,9 @@ namespace EasyWeaponPickup
             }
             catch (Exception e)
             {
-                if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+                if (EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled)
                 {
-                    InformationManager.DisplayMessage(new InformationMessage(e.Message, Colors.Red));
+                    InformationManager.DisplayMessage(new InformationMessage(e.StackTrace, Colors.Red));
                 }
             }
             
@@ -141,10 +141,11 @@ namespace EasyWeaponPickup
         private float GetMinimumPickupHeight()
         {
             if (Agent.Main == null) return 0;
-            if (Agent.Main.MountAgent == null) return 0; 
-            if (!EasyWeaponPickupConfig.Instance.RequireHorsePerk) return 0;
+            if (Agent.Main.MountAgent == null) return 0;
+            if (CharacterObject.PlayerCharacter == null) return 0;
             if (Hero.MainHero == null) return 0;
-            
+            if (EasyWeaponPickupConfig.Instance == null) return 0;
+            if (!EasyWeaponPickupConfig.Instance.RequireHorsePerk) return 0;
             return Hero.MainHero.GetPerkValue(DefaultPerks.Throwing.LongReach) ? 0 : EasyWeaponPickupConfig.Instance.MinPickupHeightOnHorse;
         }
 
@@ -155,12 +156,12 @@ namespace EasyWeaponPickup
             float minPickupHeight = GetMinimumPickupHeight();
 
             List<GameEntity> reachableDroppedItem = (from x in gameEntities
-                where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= EasyWeaponPickupConfig.Instance.MaxPickupDistance
+                where x != null && x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MaxPickupDistance
                       && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) >= minPickupHeight
-                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= EasyWeaponPickupConfig.Instance.MaxPickupHeight + MaxHeightBonus
+                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxPickupHeight + MaxHeightBonus
                 select x).ToList();
             
-            if (EasyWeaponPickupConfig.Instance.DebugEnabled)
+            if (DebugEnabled)
             {
                 InformationManager.DisplayMessage(new InformationMessage("usable mission object count : "+gameEntities.Count()));
                 InformationManager.DisplayMessage(new InformationMessage("nearest usable mission object : "+reachableDroppedItem.Count()));    
@@ -278,10 +279,10 @@ namespace EasyWeaponPickup
         {
             // find nearest ammo refill point
             List<GameEntity> ammoRefillEntity = Mission.GetActiveEntitiesWithScriptComponentOfType<StandingPointWithWeaponRequirement>().ToList();
-                        
+            
             List<GameEntity> reachableAmmoRefill = (from x in ammoRefillEntity
-                where x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= EasyWeaponPickupConfig.Instance.MaxPickupDistance
-                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= EasyWeaponPickupConfig.Instance.MaxPickupDistance + MaxHeightBonus
+                where x != null && x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MaxPickupDistance
+                      && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxPickupHeight + MaxHeightBonus
                 select x).ToList();
 
             foreach (GameEntity gameEntity in reachableAmmoRefill)
@@ -303,16 +304,24 @@ namespace EasyWeaponPickup
             get
             {
                 if (Agent.Main == null) return 0;
-                return Agent.Main.MountAgent == null ? 0 : EasyWeaponPickupConfig.Instance.HorseHeightBonus;
+                float horseHeightBonus = EasyWeaponPickupConfig.Instance == null ? EasyWeaponPickupConfig.DefaultHorseHeightBonus : EasyWeaponPickupConfig.Instance.HorseHeightBonus;
+                return Agent.Main.MountAgent == null ? 0 : horseHeightBonus;
             }
         }
+        
+        // settings
+        private float MaxPickupHeight => EasyWeaponPickupConfig.Instance == null ? EasyWeaponPickupConfig.DefaultMaxPickupHeight : EasyWeaponPickupConfig.Instance.MaxPickupHeight;
+
+        private float MaxPickupDistance => EasyWeaponPickupConfig.Instance == null ? EasyWeaponPickupConfig.DefaultMaxPickupDistance : EasyWeaponPickupConfig.Instance.MaxPickupDistance;
+
+        private bool DebugEnabled => EasyWeaponPickupConfig.Instance != null && EasyWeaponPickupConfig.Instance.DebugEnabled;
 
         // cache
         private bool _canPickup = true;
         private bool _isPressingKey = false;
         private IInputContext _input = null;
         
-        // settings
+        
         
     }
 }
