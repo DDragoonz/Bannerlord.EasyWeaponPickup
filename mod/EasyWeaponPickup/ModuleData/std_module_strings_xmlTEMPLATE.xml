@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+  <tags>
+    <tag language="EN" />
+  </tags>
+  <strings>
+    
+    <!-- MCM -->
+    
+    <string id="EWP_00000" text="Settings" />
+    <string id="EWP_00001" text="Max Pickup Distance" />
+    <string id="EWP_00002" text="Max weapon pickup distance" />
+    <string id="EWP_00003" text="Max Pickup Height" />
+    <string id="EWP_00004" text="Max weapon pickup height" />
+    <string id="EWP_00005" text="Pickup Height Bonus Mounted" />
+    <string id="EWP_00006" text="Pickup height bonus to allow you pick higher objects while mounted" />
+    <string id="EWP_00007" text="Mounted Require Perk" />
+    <string id="EWP_00008" text='Shall picking up while mounted require perk "Long Reach"?' />
+    <string id="EWP_00009" text="Minimum Pickup Height Mounted" />
+    <string id="EWP_00010" text="Minimum pick up height while mounted, to allow pick up arrow stuck on tree or walls even without Long Reach perk" />
+    <string id="EWP_00100" text="Debug" />
+    <string id="EWP_00101" text="Enable Debug" />
+    <string id="EWP_00102" text="Show debug Message" />
+    
+    
+  </strings>
+</base>
