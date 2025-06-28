@@ -21,6 +21,26 @@
     <string id="EWP_00100" text="Debug" />
     <string id="EWP_00101" text="Enable Debug" />
     <string id="EWP_00102" text="Show debug Message" />
+    <string id="EWP_00200" text="Allowed Weapon" />
+    <string id="EWP_00201" text="One Handed" />
+    <string id="EWP_00202" text="Allow Pick up One Handed weapon" />
+    <string id="EWP_00203" text="Two Handed" />
+    <string id="EWP_00204" text="Allow Pick up Two Handed weapon" />
+    <string id="EWP_00205" text="Polearm" />
+    <string id="EWP_00206" text="Allow Pick up Polearm" />
+    <string id="EWP_00207" text="Shield" />
+    <string id="EWP_00208" text="Allow Pick up Shield" />
+    <string id="EWP_00209" text="Bow" />
+    <string id="EWP_00210" text="Allow Pick up Bow" />
+    <string id="EWP_00211" text="Crossbow" />
+    <string id="EWP_00212" text="Allow Pick up Crossbow" />
+    <string id="EWP_00213" text="Thrown" />
+    <string id="EWP_00214" text="Allow Pick up Throwable weapon" />
+    <string id="EWP_00215" text="Pistol" />
+    <string id="EWP_00216" text="Allow Pick up Pistol" />
+    <string id="EWP_00217" text="Musket" />
+    <string id="EWP_00218" text="Allow Pick up Musket" />
+    
     
     
   </strings>

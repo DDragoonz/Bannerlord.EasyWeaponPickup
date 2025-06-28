@@ -213,15 +213,33 @@ namespace EasyWeaponPickup
 
             bool hasEmptySlot = false;
 
-            pickableItem = new HashSet<ItemObject.ItemTypeEnum>
+            
+            if (EasyWeaponPickupConfig.Instance != null)
             {
-                ItemObject.ItemTypeEnum.OneHandedWeapon,
-                ItemObject.ItemTypeEnum.TwoHandedWeapon,
-                ItemObject.ItemTypeEnum.Polearm,
-                ItemObject.ItemTypeEnum.Shield,
-                ItemObject.ItemTypeEnum.Bow,
-                ItemObject.ItemTypeEnum.Crossbow,
-            };
+                pickableItem = new HashSet<ItemObject.ItemTypeEnum>();
+                if (EasyWeaponPickupConfig.Instance.AllowOneHanded) pickableItem.Add(ItemObject.ItemTypeEnum.OneHandedWeapon);
+                if (EasyWeaponPickupConfig.Instance.AllowTwoHanded) pickableItem.Add(ItemObject.ItemTypeEnum.TwoHandedWeapon);
+                if (EasyWeaponPickupConfig.Instance.AllowPolearm) pickableItem.Add(ItemObject.ItemTypeEnum.Polearm);
+                if (EasyWeaponPickupConfig.Instance.AllowShield) pickableItem.Add(ItemObject.ItemTypeEnum.Shield);
+                if (EasyWeaponPickupConfig.Instance.AllowBow) pickableItem.Add(ItemObject.ItemTypeEnum.Bow);
+                if (EasyWeaponPickupConfig.Instance.AllowCrossbow) pickableItem.Add(ItemObject.ItemTypeEnum.Crossbow);
+                if (EasyWeaponPickupConfig.Instance.AllowPistol) pickableItem.Add(ItemObject.ItemTypeEnum.Pistol);
+                if (EasyWeaponPickupConfig.Instance.AllowMusket) pickableItem.Add(ItemObject.ItemTypeEnum.Musket);
+            }
+            else
+            {
+                pickableItem = new HashSet<ItemObject.ItemTypeEnum>()
+                {
+                    ItemObject.ItemTypeEnum.OneHandedWeapon,
+                    ItemObject.ItemTypeEnum.TwoHandedWeapon,
+                    ItemObject.ItemTypeEnum.Polearm,
+                    ItemObject.ItemTypeEnum.Shield,
+                    ItemObject.ItemTypeEnum.Bow,
+                    ItemObject.ItemTypeEnum.Crossbow,
+                    ItemObject.ItemTypeEnum.Pistol,
+                    ItemObject.ItemTypeEnum.Musket,
+                };
+            }
 
             allowedAmmoClass = new HashSet<WeaponClass>();
 
@@ -267,7 +285,14 @@ namespace EasyWeaponPickup
 
             if (hasEmptySlot)
             {
-                pickableItem.Add(ItemObject.ItemTypeEnum.Thrown); // thrown item always can be picked up.    
+                if (EasyWeaponPickupConfig.Instance != null)
+                {
+                    if (EasyWeaponPickupConfig.Instance.AllowThrown) pickableItem.Add(ItemObject.ItemTypeEnum.Thrown); 
+                }
+                else
+                {
+                    pickableItem.Add(ItemObject.ItemTypeEnum.Thrown); // thrown item always can be picked up.    
+                }
             }
             else
             {
