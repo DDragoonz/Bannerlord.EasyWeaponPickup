@@ -84,6 +84,5 @@ namespace EasyWeaponPickup
 
 #endregion
         
-        
     }
 }

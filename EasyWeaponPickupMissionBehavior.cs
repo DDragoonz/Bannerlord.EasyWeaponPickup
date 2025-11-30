@@ -151,11 +151,11 @@ namespace EasyWeaponPickup
 
         private UsableMissionObject GetNearestDroppedItem(HashSet<ItemObject.ItemTypeEnum> pickableItem, HashSet<WeaponClass> allowedAmmoClass)
         {
-            List<GameEntity> gameEntities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>().ToList();
+            List<WeakGameEntity> gameEntities = Mission.GetActiveEntitiesWithScriptComponentOfType<SpawnedItemEntity>().ToList();
 
             float minPickupHeight = GetMinimumPickupHeight();
 
-            List<GameEntity> reachableDroppedItem = (from x in gameEntities
+            List<WeakGameEntity> reachableDroppedItem = (from x in gameEntities
                 where x != null && x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MaxPickupDistance
                       && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) >= minPickupHeight
                       && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxPickupHeight + MaxHeightBonus
@@ -167,7 +167,7 @@ namespace EasyWeaponPickup
                 InformationManager.DisplayMessage(new InformationMessage("nearest usable mission object : "+reachableDroppedItem.Count()));    
             }
             
-            foreach (GameEntity gameEntity in reachableDroppedItem)
+            foreach (WeakGameEntity gameEntity in reachableDroppedItem)
             {
                 foreach (SpawnedItemEntity droppedItem in gameEntity.GetScriptComponents<SpawnedItemEntity>())
                 {
@@ -303,14 +303,14 @@ namespace EasyWeaponPickup
         private UsableMissionObject GetNearestAmmoRefill()
         {
             // find nearest ammo refill point
-            List<GameEntity> ammoRefillEntity = Mission.GetActiveEntitiesWithScriptComponentOfType<StandingPointWithWeaponRequirement>().ToList();
+            List<WeakGameEntity> ammoRefillEntity = Mission.GetActiveEntitiesWithScriptComponentOfType<StandingPointWithWeaponRequirement>().ToList();
             
-            List<GameEntity> reachableAmmoRefill = (from x in ammoRefillEntity
+            List<WeakGameEntity> reachableAmmoRefill = (from x in ammoRefillEntity
                 where x != null && x.GlobalPosition.AsVec2.DistanceSquared(Agent.Main.Position.AsVec2) <= MaxPickupDistance
                       && Math.Abs(x.GlobalPosition.Z - Agent.Main.Position.Z) <= MaxPickupHeight + MaxHeightBonus
                 select x).ToList();
 
-            foreach (GameEntity gameEntity in reachableAmmoRefill)
+            foreach (WeakGameEntity gameEntity in reachableAmmoRefill)
             {
                 foreach (StandingPointWithWeaponRequirement ammoRefill in gameEntity.GetScriptComponents<StandingPointWithWeaponRequirement>())
                 {
@@ -345,8 +345,6 @@ namespace EasyWeaponPickup
         private bool _canPickup = true;
         private bool _isPressingKey = false;
         private IInputContext _input = null;
-        
-        
         
     }
 }

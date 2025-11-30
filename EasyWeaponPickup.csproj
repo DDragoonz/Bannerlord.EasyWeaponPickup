@@ -32,6 +32,9 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>$(SolutionDir)\mod\EasyWeaponPickup\bin\Win64_Shipping_Client\</OutputPath>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Bannerlord.MCM" Version="5.0.0" IncludeAssets="compile" />
     </ItemGroup>
